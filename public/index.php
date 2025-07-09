@@ -1,3 +1,4 @@
 <?php
 
-print_r($_SERVER);
+$uri = $_SERVER['REQUEST_URI'];
+
