@@ -1,21 +1,26 @@
 <?php
+// как работает код?
 
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        // Подключение автозагрузки через composer
+require __DIR__ . '/../vendor/autoload.php';
 
-switch ($path) {
-  case '/':
-    echo <<<EOT
-    <a href="/welcome">welcome</a>
-    <br>
-    <a href="/not-found">not-found</a>
-    EOT;
-    break;
-  case '/welcome':
-    echo '<a href="/">main</a>';
-    break;
-  default:
-    header("HTTP/1.1 404");
-    echo 'Page not found. <a href="/">main</a>';
-}
+use Slim\Factory\AppFactory;
 
+$app = AppFactory::create();
+$app->addErrorMiddleware(true, true, true);
 
+$app->get('/', function ($request, $response) {
+    return $response->getBody()->write('Welcome to Slim!');
+    // Благодаря пакету slim/http этот же код можно записать короче
+    // return $response->write('Welcome to Slim!');
+});
+
+$app->get('/users', function ($request, $response) {
+    return $response->write('GET /users');
+});
+
+$app->post('/users', function ($request, $response) {
+    return $response->write('POST /users');
+});
+
+$app->run();
