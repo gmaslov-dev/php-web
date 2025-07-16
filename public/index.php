@@ -1,5 +1,4 @@
 <?php
-// как работает код?
 
         // Подключение автозагрузки через composer
 require __DIR__ . '/../vendor/autoload.php';
@@ -22,5 +21,11 @@ $app->get('/users', function ($request, $response) {
 $app->post('/users', function ($request, $response) {
     return $response->write('POST /users');
 });
+
+
+// $app->post('/users', function ($request, $response) {
+//     $data = ['message' => 'POST /users'];
+//     return $response->withJson($data); // Автоматически добавляет Content-Type и возвращает JSON
+// });
 
 $app->run();
