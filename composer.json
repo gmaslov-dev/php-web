@@ -1,5 +1,18 @@
 {
+    "name": "user/php-web",
+    "autoload": {
+        "psr-4": {
+            "User\\PhpWeb\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "gmaslov-dev",
+            "email": "gennadiy.dev@yandex.ru"
+        }
+    ],
     "require": {
+        "fakerphp/faker": "^1.24",
         "slim/slim": "^4.14",
         "slim/psr7": "^1.7",
         "slim/http": "^1.4",

@@ -8,24 +8,20 @@ use Slim\Factory\AppFactory;
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
+$companies = User\PhpWeb\Generator::generate(100);
+
 $app->get('/', function ($request, $response) {
-    return $response->getBody()->write('Welcome to Slim!');
-    // Благодаря пакету slim/http этот же код можно записать короче
-    // return $response->write('Welcome to Slim!');
+    return $response->write('go to the /companies');
 });
 
-$app->get('/users', function ($request, $response) {
-    return $response->write('GET /users');
+// BEGIN (write your solution here)
+$app->get('/companies', function($request, $response) use ($companies) {
+    $page = $request->getQueryParam('page', 1);
+    $per = $request->getQueryParam('per', 5);
+
+    $result = array_slice($companies, ($page - 1) * $per, $per);
+    return $response->withJson($result);
 });
-
-$app->post('/users', function ($request, $response) {
-    return $response->write('POST /users');
-});
-
-
-// $app->post('/users', function ($request, $response) {
-//     $data = ['message' => 'POST /users'];
-//     return $response->withJson($data); // Автоматически добавляет Content-Type и возвращает JSON
-// });
+// END
 
 $app->run();
