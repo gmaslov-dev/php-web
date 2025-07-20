@@ -1,0 +1,15 @@
+<table>
+    <?php foreach ($users as $user): ?>
+        <tr>
+            <?php
+                $id = $user['id'];
+            ?>
+            <td><?= $id  ?></td>
+            <td>
+              <a href="/users/<?= $id ?>">
+                <?= $user['firstName'] ?>
+              </a>
+            </td>
+        </tr>
+    <?php endforeach ?>
+</table>
