@@ -3,14 +3,10 @@
         // Подключение автозагрузки через composer
 use Slim\Factory\AppFactory;
 use DI\Container;
-use User\PhpWeb\Generator;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Список пользователей
-// Каждый пользователь – ассоциативный массив
-// следующей структуры: id, firstName, lastName, email
-$users = Generator::generate(100);
+$users = ['mike', 'mishel', 'adel', 'keks', 'kamila'];
 
 $container = new Container();
 $container->set('renderer', function () {
@@ -21,24 +17,10 @@ AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
-$app->get('/', function ($request, $response) {
-    return $this->get('renderer')->render($response, 'index.phtml');
+$app->get('/search', function ($request, $response, $args) use ($users){
+    $term = $request->getQueryParam('term');
+    $filteredUsers = array_filter($users, fn($user) => str_contains($user, $term));
+    return $this->get('renderer')->render($response, 'users/search.phtml', ['users' => $filteredUsers, 'term' => $term]);
 });
-
-
-
-
-$app->get('/users', function ($request, $response) use ($users) {
-    return $this->get('renderer')->render($response, 'users/index.phtml', ['users' => $users]);
-});
-
-$app->get('/users/{id}', function ($request, $response, $args) use ($users) {
-    if (isset($users[$args['id']])) {
-        return $this->get('renderer')->render($response, 'users/show.phtml', ['user' => $users[$args['id']]]);
-    } else {
-        return $response->withStatus(404)->write('User not found');
-    }
-});
-// END
 
 $app->run();
