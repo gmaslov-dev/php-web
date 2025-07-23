@@ -1,6 +1,6 @@
 <?php
 
-namespace User\PhpWeb;
+namespace PhpWeb;
 
 use Faker\Factory as FakerFactory;
 

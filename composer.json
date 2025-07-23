@@ -2,7 +2,7 @@
     "name": "user/php-web",
     "autoload": {
         "psr-4": {
-            "User\\PhpWeb\\": "src/"
+            "PhpWeb\\": "src/"
         }
     },
     "authors": [

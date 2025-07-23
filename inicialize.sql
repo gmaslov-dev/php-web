@@ -1,0 +1,7 @@
+DROP TABLE if exists users;
+
+CREATE TABLE users (
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
+   name VARCHAR(50),
+   email VARCHAR(50) UNIQUE
+);
