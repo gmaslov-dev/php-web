@@ -1,14 +1,23 @@
 <?php
 
+use PhpWeb\User;
+use PhpWeb\UserDAO;
 use PhpWeb\Validator;
 use Slim\Factory\AppFactory;
 use DI\Container;
 use Slim\Views\PhpRenderer;
 
-
 require __DIR__ . '/../vendor/autoload.php';
 
-$users = ['mike', 'mishel', 'adel', 'keks', 'kamila'];
+$conn = new PDO('sqlite:php-web.sqlite');
+$conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+$conn->exec(file_get_contents('init.sql'));
+
+
+$dao = new UserDAO($conn);
+$user = new User('abc@mail.ex', 'User');
+$dao->save($user);
+
 
 $container = new Container();
 $container->set('renderer', function () {
@@ -20,32 +29,17 @@ $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
 // стартовая страница
-$app->get('/', function ($request, $response) {
-    return $this->get('renderer')->render($response, 'index.phtml');
+$app->get('/', function ($request, $response) use ($user) {
+    $renderer = $this->get('renderer');
+    $content = $renderer->fetch('index.phtml', ['id' => $user->getId()]);
+    return $this->get('renderer')->render($response, "layout.phtml", ['content' => $content]);
+});
+
+$app->get('/users/new', function ($request, $response) {
+    return $this->get('renderer')->render($response, 'users/new.phtml');
 });
 
 // пользователи
-$app->get('/users/new', function ($request, $response) {
-    $params = [
-        'user' => ['name' => '', 'email' => '', 'password' => '', 'passwordConfirmation' => '', 'city' => ''],
-        'errors' => []
-    ];
-    return $this->get('renderer')->render($response, "users/new.phtml", $params);
-});
 
-$app->post('/users', function ($request, $response) use ($repo) {
-    $validator = new Validator();
-    $user = $request->getParsedBodyParam('user');
-    $errors = $validator->validate($user);
-    if (count($errors) === 0) {
-        $repo->save($user);
-        return $response->withRedirect('/users', 302);
-    }
-    $params = [
-        'user' => $user,
-        'errors' => $errors
-    ];
-    return $this->get('renderer')->render($response, "users/new.phtml", $params);
-});
 
 $app->run();
