@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title><?= $title ?? 'Мой сайт' ?></title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <?php include __DIR__ . '/nav.phtml'; ?>
 
 <main>
-    <?= $content ?>
+    <?= $content ?? '' ?>
 </main>
 </body>
 </html>

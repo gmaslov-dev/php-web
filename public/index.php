@@ -2,22 +2,17 @@
 
 use PhpWeb\User;
 use PhpWeb\UserDAO;
-use PhpWeb\Validator;
+use PhpWeb\UserValidator;
 use Slim\Factory\AppFactory;
 use DI\Container;
 use Slim\Views\PhpRenderer;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$conn = new PDO('sqlite:php-web.sqlite');
+$conn = new PDO('sqlite:../php-web.sqlite');
 $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-$conn->exec(file_get_contents('init.sql'));
-
 
 $dao = new UserDAO($conn);
-$user = new User('abc@mail.ex', 'User');
-$dao->save($user);
-
 
 $container = new Container();
 $container->set('renderer', function () {
@@ -26,20 +21,41 @@ $container->set('renderer', function () {
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
-$app->addErrorMiddleware(true, true, true);
+$app->addRoutingMiddleware();     // Сначала роутинг
+$app->addBodyParsingMiddleware(); // Потом парсинг тела
+$app->addErrorMiddleware(true, true, true); // И ошибки в конце
 
 // стартовая страница
-$app->get('/', function ($request, $response) use ($user) {
-    $renderer = $this->get('renderer');
-    $content = $renderer->fetch('index.phtml', ['id' => $user->getId()]);
-    return $this->get('renderer')->render($response, "layout.phtml", ['content' => $content]);
-});
-
-$app->get('/users/new', function ($request, $response) {
-    return $this->get('renderer')->render($response, 'users/new.phtml');
+$app->get('/', function ($request, $response) {
+    $renderer = $this->get('renderer')->fetch('index.phtml');
+    $params = ['title' => 'Homepage', 'content' => $renderer];
+    return $this->get('renderer')->render($response, "layout.phtml", $params);
 });
 
 // пользователи
+$app->post('/users', function ($request, $response) use ($dao) {
+    $validator = new UserValidator();
+    $user = $request->getParsedBodyParam('user');
+    $errors = $validator->validate($user, $dao);
 
+    if (count($errors) === 0) {
+        $user = new User($user['nickname'], $user['email']);
+        $dao->save($user);
+        return $response->withRedirect('/users', 302);
+    }
+    return $response->withRedirect('/users');
+});
+
+$app->get('/users', function ($request, $response) use ($dao) {
+    $users = $dao->getAll();
+    $renderer = $this->get('renderer')->fetch('users/index.phtml', ['users' => $users]);
+    $params = ['content' => $renderer];
+    return $this->get('renderer')->render($response, "layout.phtml", $params);
+});
+
+$app->get('/users/new', function ($request, $response) {
+    $renderer = $this->get('renderer')->fetch('users/new.phtml');
+    return $this->get('renderer')->render($response, "layout.phtml", ['content' => $renderer]);
+});
 
 $app->run();

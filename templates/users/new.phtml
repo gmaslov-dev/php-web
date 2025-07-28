@@ -1,7 +1,7 @@
-<form action="/users" method="post">
-    <label for="name">Имя</label>
-    <input type="text" name="name" id="name">
+<form action="/users" name="users" method="post">
+    <label for="nickname">Имя</label>
+    <input type="text" name="user[nickname]">
     <label for="email">Email</label>
-    <input type="email" name="email" id="email">
+    <input type="email" name="user[email]">
     <button type="submit">Сохранить</button>
 </form>
