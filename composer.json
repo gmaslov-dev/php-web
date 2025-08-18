@@ -18,6 +18,7 @@
         "slim/http": "^1.4",
         "slim/php-view": "^3.4",
         "php-di/php-di": "^7.0",
-        "tightenco/collect": "^9.52"
+        "tightenco/collect": "^9.52",
+        "vlucas/phpdotenv": "^5.6"
     }
 }

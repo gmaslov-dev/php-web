@@ -6,8 +6,19 @@ use PhpWeb\UserValidator;
 use Slim\Factory\AppFactory;
 use DI\Container;
 use Slim\Views\PhpRenderer;
+use Dotenv\Dotenv;
 
 require __DIR__ . '/../vendor/autoload.php';
+
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+$dsn = sprintf(
+    "mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4",
+    $_ENV['MYSQL_HOST'],
+    $_ENV['MYSQL_PORT'],
+    $_ENV['MYSQL_DATABASE']
+);
 
 $conn = new PDO('sqlite:../php-web.sqlite');
 $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);

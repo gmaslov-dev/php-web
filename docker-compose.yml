@@ -93,18 +93,6 @@ services:
     networks:
       - app-network
 
-  composer:
-    image: composer:latest
-    container_name: composer
-    volumes:
-      - ./:/app
-    working_dir: /app
-    depends_on:
-      - app
-    entrypoint: ['composer']
-    networks:
-      - app-network
-
 networks:
   app-network:
     driver: bridge
