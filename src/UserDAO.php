@@ -31,7 +31,7 @@ class UserDAO
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch();
         if ($result) {
-            $user = new User($result['email'], $result['name']);
+            $user = new User($result['name'], $result['email']);
             $user->setId($result['id']);
             return $user;
         }

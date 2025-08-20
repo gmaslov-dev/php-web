@@ -1,4 +1,4 @@
-<form action="/users" name="users" method="post">
+<form action="<?= $router->urlFor('users.post'); ?>" name="users" method="post">
     <label for="nickname">Имя</label>
     <input type="text" name="user[nickname]">
     <label for="email">Email</label>

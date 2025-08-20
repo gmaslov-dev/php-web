@@ -6,19 +6,12 @@ use PhpWeb\UserValidator;
 use Slim\Factory\AppFactory;
 use DI\Container;
 use Slim\Views\PhpRenderer;
-use Dotenv\Dotenv;
+// use Dotenv\Dotenv;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-$dsn = sprintf(
-    "mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4",
-    $_ENV['MYSQL_HOST'],
-    $_ENV['MYSQL_PORT'],
-    $_ENV['MYSQL_DATABASE']
-);
+//$dotenv = Dotenv::createImmutable(__DIR__);
+//$dotenv->load();
 
 $conn = new PDO('sqlite:../php-web.sqlite');
 $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
@@ -36,15 +29,23 @@ $app->addRoutingMiddleware();     // Сначала роутинг
 $app->addBodyParsingMiddleware(); // Потом парсинг тела
 $app->addErrorMiddleware(true, true, true); // И ошибки в конце
 
+$router = $app->getRouteCollector()->getRouteParser();
+
 // стартовая страница
-$app->get('/', function ($request, $response) {
+$app->get('/', function ($request, $response) use ($router){
+
     $renderer = $this->get('renderer')->fetch('index.phtml');
-    $params = ['title' => 'Homepage', 'content' => $renderer];
+
+    $params = [
+        'title' => 'Homepage',
+        'content' => $renderer,
+        'router' => $router
+    ];
     return $this->get('renderer')->render($response, "layout.phtml", $params);
-});
+})->setName('home');
 
 // пользователи
-$app->post('/users', function ($request, $response) use ($dao) {
+$app->post('/users', function ($request, $response) use ($dao, $app, $router) {
     $validator = new UserValidator();
     $user = $request->getParsedBodyParam('user');
     $errors = $validator->validate($user, $dao);
@@ -54,19 +55,32 @@ $app->post('/users', function ($request, $response) use ($dao) {
         $dao->save($user);
         return $response->withRedirect('/users', 302);
     }
-    return $response->withRedirect('/users');
-});
+    return $response->withRedirect('/users', ['router' => $router]);
+})->setName('users.post');
 
-$app->get('/users', function ($request, $response) use ($dao) {
+$app->get('/users', function ($request, $response) use ($dao, $app, $router) {
     $users = $dao->getAll();
     $renderer = $this->get('renderer')->fetch('users/index.phtml', ['users' => $users]);
-    $params = ['content' => $renderer];
+    $params = ['content' => $renderer, 'router' => $router];
+
     return $this->get('renderer')->render($response, "layout.phtml", $params);
-});
+})->setName('users.get');
 
-$app->get('/users/new', function ($request, $response) {
-    $renderer = $this->get('renderer')->fetch('users/new.phtml');
-    return $this->get('renderer')->render($response, "layout.phtml", ['content' => $renderer]);
-});
+$app->get('/users/new', function ($request, $response) use ($router) {
+    $renderer = $this->get('renderer')->fetch('users/new.phtml', ['router' => $router]);
+    return $this->get('renderer')->render($response, "layout.phtml", ['content' => $renderer, 'router' => $router]);
+})->setName('users/new');
 
+$app->get('/users/{id}', function ($request, $response) use ($dao, $router) {
+    $userId = $request->getAttribute('id');
+    $user = $dao->find($userId);
+
+    if (!$user) {
+        return $response->withStatus(404)->write('Пользователь не найден');
+    }
+
+    $renderer = $this->get('renderer')->fetch('users/show.phtml', ['name' => $user->getName(), 'email' => $user->getEmail()]);
+
+    return $this->get('renderer')->render($response, "layout.phtml", ['content' => $renderer, 'router' => $router]);
+});
 $app->run();
