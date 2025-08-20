@@ -13,6 +13,8 @@ require __DIR__ . '/../vendor/autoload.php';
 //$dotenv = Dotenv::createImmutable(__DIR__);
 //$dotenv->load();
 
+session_start();
+
 $conn = new PDO('sqlite:../php-web.sqlite');
 $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
@@ -21,6 +23,10 @@ $dao = new UserDAO($conn);
 $container = new Container();
 $container->set('renderer', function () {
     return new PhpRenderer(__DIR__ . '/../templates');
+});
+
+$container->set('flash', function () {
+    return new \Slim\Flash\Messages();
 });
 
 AppFactory::setContainer($container);
@@ -49,19 +55,28 @@ $app->post('/users', function ($request, $response) use ($dao, $app, $router) {
     $validator = new UserValidator();
     $user = $request->getParsedBodyParam('user');
     $errors = $validator->validate($user, $dao);
+    $this->get('flash')->addMessage('success', 'User was added succesfully');
+
 
     if (count($errors) === 0) {
         $user = new User($user['nickname'], $user['email']);
         $dao->save($user);
         return $response->withRedirect('/users', 302);
     }
-    return $response->withRedirect('/users', ['router' => $router]);
+    return $response->withRedirect('/users');
 })->setName('users.post');
 
 $app->get('/users', function ($request, $response) use ($dao, $app, $router) {
     $users = $dao->getAll();
-    $renderer = $this->get('renderer')->fetch('users/index.phtml', ['users' => $users]);
+    $message = $this->get('flash')->getMessages();
+    $renderer = $this->get('renderer')->fetch('users/index.phtml', ['users' => $users, 'message' => $message['success']]);
+
+
+    dump($message);
+
     $params = ['content' => $renderer, 'router' => $router];
+
+
 
     return $this->get('renderer')->render($response, "layout.phtml", $params);
 })->setName('users.get');

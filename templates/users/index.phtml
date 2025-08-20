@@ -1,4 +1,6 @@
 <ul>
+    <i><?= $message[0]; ?></i>
+    <br>
     <?php foreach ($users as $user): ?>
         <li>
             <?= htmlspecialchars($user->getName()) ?> - <?= htmlspecialchars($user->getEmail()) ?>
