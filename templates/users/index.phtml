@@ -1,9 +1,12 @@
-<ul>
-    <i><?= $message[0]; ?></i>
-    <br>
+<table>
     <?php foreach ($users as $user): ?>
-        <li>
-            <?= htmlspecialchars($user->getName()) ?> - <?= htmlspecialchars($user->getEmail()) ?>
-        </li>
-    <?php endforeach; ?>
-</ul>
+        <tr>
+            <td>
+                <?= $user['id'] ?>
+            </td>
+            <td>
+                <a href="/schools/<?= $user['id'] ?>"><?= $user['name'] ?></a>
+            </td>
+        </tr>
+    <?php endforeach ?>
+</table>

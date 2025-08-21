@@ -50,7 +50,14 @@ $app->get('/', function ($request, $response) use ($router){
     return $this->get('renderer')->render($response, "layout.phtml", $params);
 })->setName('home');
 
+
 // пользователи
+$app->get('/users', function ($request, $response) use ($dao, $app, $router) {
+    $users = $dao->getAll();
+    return $this->get('renderer')->render($response, "layout.phtml", ['users' => $users]);
+})->setName('users.get');
+
+
 $app->post('/users', function ($request, $response) use ($dao, $app, $router) {
     $validator = new UserValidator();
     $user = $request->getParsedBodyParam('user');
@@ -66,20 +73,7 @@ $app->post('/users', function ($request, $response) use ($dao, $app, $router) {
     return $response->withRedirect('/users');
 })->setName('users.post');
 
-$app->get('/users', function ($request, $response) use ($dao, $app, $router) {
-    $users = $dao->getAll();
-    $message = $this->get('flash')->getMessages();
-    $renderer = $this->get('renderer')->fetch('users/index.phtml', ['users' => $users, 'message' => $message['success']]);
 
-
-    dump($message);
-
-    $params = ['content' => $renderer, 'router' => $router];
-
-
-
-    return $this->get('renderer')->render($response, "layout.phtml", $params);
-})->setName('users.get');
 
 $app->get('/users/new', function ($request, $response) use ($router) {
     $renderer = $this->get('renderer')->fetch('users/new.phtml', ['router' => $router]);
