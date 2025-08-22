@@ -54,9 +54,13 @@ class UserDAO
 
     public function getAll(): array
     {
-        $stmt = $this->pdo->query('SELECT * FROM users');
-        $rows = $stmt->fetchAll();
+        $rows = $this->pdo->query('SELECT * FROM users')->fetchAll();
 
-        return array_map(fn($row) => new User($row['email'], $row['name']), $rows);
+        return array_map(function ($row) {
+            $user = new User($row['name'], $row['email']);
+            $user->setId($row['id']);
+
+            return $user;
+        }, $rows);
     }
 }

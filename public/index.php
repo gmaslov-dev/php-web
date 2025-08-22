@@ -6,12 +6,8 @@ use PhpWeb\UserValidator;
 use Slim\Factory\AppFactory;
 use DI\Container;
 use Slim\Views\PhpRenderer;
-// use Dotenv\Dotenv;
 
 require __DIR__ . '/../vendor/autoload.php';
-
-//$dotenv = Dotenv::createImmutable(__DIR__);
-//$dotenv->load();
 
 session_start();
 
@@ -54,8 +50,13 @@ $app->get('/', function ($request, $response) use ($router){
 // пользователи
 $app->get('/users', function ($request, $response) use ($dao, $app, $router) {
     $users = $dao->getAll();
-    return $this->get('renderer')->render($response, "layout.phtml", ['users' => $users]);
+    return $this->get('renderer')->render($response, "users/index.phtml", ['users' => $users, 'router' => $router]);
 })->setName('users.get');
+
+
+
+
+
 
 
 $app->post('/users', function ($request, $response) use ($dao, $app, $router) {
@@ -63,7 +64,6 @@ $app->post('/users', function ($request, $response) use ($dao, $app, $router) {
     $user = $request->getParsedBodyParam('user');
     $errors = $validator->validate($user, $dao);
     $this->get('flash')->addMessage('success', 'User was added succesfully');
-
 
     if (count($errors) === 0) {
         $user = new User($user['nickname'], $user['email']);
