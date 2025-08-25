@@ -1,3 +1,5 @@
-<?php
-    echo $email;
-?>
+<div>
+    id: <?= $user->getId() ?>
+    name: <?= htmlspecialchars($user->getName()) ?>
+    email: <?= htmlspecialchars($user->getEmail()) ?>
+</div>
