@@ -63,6 +63,46 @@ $app->get('/users', function ($request, $response) {
 
 
 // Пользователь
+$app->get('/users/new', function ($request, $response) {
+    $routeContext = RouteContext::fromRequest($request);
+    $router = $routeContext->getRouteParser();
+    $success = $this->get('flash')->getMessages()['success'] ?? [];
+
+    $params = [
+        'userData' => [],
+        'errors' => [],
+        'router' => $router,
+        'success' => $success
+    ];
+
+    return $this->get('renderer')->render($response, 'users/new.phtml', $params);
+})->setName('users.new');
+
+$app->post('/users', function ($request, $response) {
+    $dao = $this->get(UserDAO::class);
+    $userData = $request->getParsedBodyParam('user');
+    $validator = new UserValidator();
+
+    $validator->validate($userData, $dao);
+
+    $errors = $validator->validate($userData, $dao);
+
+
+    if (count($errors) === 0) {
+        $user = new User($userData['nickname'], $userData['email']);
+        $dao->save($user);
+        $this->get('flash')->addMessage('success', 'User was added succesfully');
+        return $response->withRedirect('/users', 302);
+    }
+
+    $params = [
+        'schoolData' => $userData,
+        'errors' => $errors
+    ];
+
+    return $this->get('renderer')->render($response, 'users/new.phtml', $params);
+})->setName('users.post');
+
 $app->get('/users/{id}', function ($request, $response, array $args) {
     $id = $args['id'];
     $UserDAO = $this->get(UserDAO::class);
@@ -77,20 +117,7 @@ $app->get('/users/{id}', function ($request, $response, array $args) {
     return $this->get('renderer')->render($response, 'users/show.phtml', $params);
 })->setName('user');
 
-//
-//$app->post('/users', function ($request, $response) {
-//    $validator = new UserValidator();
-//    $user = $request->getParsedBodyParam('user');
-//    $errors = $validator->validate($user, $dao);
-//    $this->get('flash')->addMessage('success', 'User was added succesfully');
-//
-//    if (count($errors) === 0) {
-//        $user = new User($user['nickname'], $user['email']);
-//        $dao->save($user);
-//        return $response->withRedirect('/users', 302);
-//    }
-//    return $response->withRedirect('/users');
-//})->setName('users.post');
+
 //
 //
 //

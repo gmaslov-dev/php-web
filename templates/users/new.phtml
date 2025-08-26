@@ -1,7 +1,19 @@
-<form action="<?= $router->urlFor('users.post'); ?>" name="users" method="post">
+<form action="/users" name="users" method="post">
     <label for="nickname">Имя</label>
-    <input type="text" name="user[nickname]">
+    <input type="text" name="user[name]" value="<?= htmlspecialchars($userData['name'] ?? '');?>">
+    <?php if (isset($errors['name'])): ?>
+        <span><?= $errors['name'] ?></span>
+    <?php endif ?>
     <label for="email">Email</label>
-    <input type="email" name="user[email]">
+    <input type="email" name="user[email]" value="<?= htmlspecialchars($userData['email'] ?? '');?>">
+    <?php if (isset($errors['name'])): ?>
+        <span><?= $errors['email'] ?></span>
+    <?php endif ?>
     <button type="submit">Сохранить</button>
+    <?php dump($success ?? ''); ?>
+    <?php if (!empty($success)): ?>
+        <div>
+            <p><?= htmlspecialchars($success) ?></p>
+        </div>
+    <?php endif; ?>
 </form>
