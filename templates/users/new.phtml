@@ -10,10 +10,9 @@
         <span><?= $errors['email'] ?></span>
     <?php endif ?>
     <button type="submit">Сохранить</button>
-    <?php dump($success ?? ''); ?>
     <?php if (!empty($success)): ?>
         <div>
-            <p><?= htmlspecialchars($success) ?></p>
+            <p><?= $success[0] ?? '' ?></p>
         </div>
     <?php endif; ?>
 </form>
