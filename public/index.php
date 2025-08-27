@@ -104,6 +104,21 @@ $app->post('/users', function ($request, $response) {
     return $this->get('renderer')->render($response, 'users/new.phtml', $params)->withStatus(422);
 })->setName('users.post');
 
+// Обновление пользователя
+$app->get('/users/{id}/edit', function ($request, $response, array $args) {
+    $id = $args['id'];
+    $user = $this->get(UserDAO::class)->find($id);
+    $params = [
+        'userData' => [
+            'id' => $user->getId(),
+            'name' => $user->getName(),
+            'email' => $user->getEmail()
+        ],
+        'errors' => []
+    ];
+    return $this->get('renderer')->render($response, 'users/edit.phtml', $params);
+})->setName('user.edit');
+
 // Конкретный пользователь
 $app->get('/users/{id}', function ($request, $response, array $args) {
     $id = $args['id'];
