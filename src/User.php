@@ -25,6 +25,16 @@ class User
         $this->id = $id;
     }
 
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
     public function getEmail(): string
     {
         return $this->email;

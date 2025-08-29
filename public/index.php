@@ -8,6 +8,7 @@ use DI\Container;
 use Slim\Flash\Messages;
 use Slim\Routing\RouteContext;
 use Slim\Views\PhpRenderer;
+use Slim\Middleware\MethodOverrideMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -34,6 +35,7 @@ $container->set('flash', function () {
 
 $app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
+$app->add(MethodOverrideMiddleware::class);
 
 // Регистрируем роутер
 $router = $app->getRouteCollector()->getRouteParser();
@@ -81,14 +83,12 @@ $app->get('/users/new', function ($request, $response) {
 
 // Сохранение пользователя
 $app->post('/users', function ($request, $response) {
-
     $dao = $this->get(UserDAO::class);
     $userData = $request->getParsedBodyParam('user');
     $validator = new UserValidator();
 
-    $validator->validate($userData, $dao);
-    $errors = $validator->validate($userData, $dao);
-
+    $errors = $validator->validateEmpty($userData, $dao);
+    $errors = $validator->validateUniqEmail($userData['email'], $dao);
     if (count($errors) === 0) {
         $user = new User($userData['name'], $userData['email']);
         $dao->save($user);
@@ -104,10 +104,52 @@ $app->post('/users', function ($request, $response) {
     return $this->get('renderer')->render($response, 'users/new.phtml', $params)->withStatus(422);
 })->setName('users.post');
 
+$app->patch('/users/{id}', function ($request, $response, array $args) {
+    $UserDAO = $this->get(UserDAO::class);
+    $id = $args['id'];
+    $user = $UserDAO->find($id);
+    $data = $request->getParsedBodyParam('user');
+
+    $validator = new UserValidator();
+    $errors = $validator->validateEmpty(['name' => $user->getName(), 'email' => $user->getEmail()], $UserDAO);
+    if (count($errors) === 0) {
+        $user->setName($data['name']);
+        $user->setEmail($data['email']);
+        $this->get('flash')->addMessage('success', 'User was updated succesfully');
+        $UserDAO->update($user);
+        $url = $this->get('router')->urlFor('user', ['id' => $id]);
+        return $response->withRedirect($url);
+    }
+
+    $params = [
+        'userData' => ['id' => $id, ...$data],
+        'errors' => $errors,
+    ];
+
+    return $this->get('renderer')->render($response, 'users/edit.phtml', $params)->withStatus(422);
+});
+
+// Конкретный пользователь
+$app->get('/users/{id}', function ($request, $response, array $args) {
+
+    $UserDAO = $this->get(UserDAO::class);
+    $id = $args['id'];
+    $user = $UserDAO->find($id);
+
+    if (!$user) {
+       return $response->write('Page not found')->withStatus(404);
+    }
+    $success = $this->get('flash')->getMessages()['success'] ?? [];
+    $params = ['user' => $user, 'success' => $success];
+
+    return $this->get('renderer')->render($response, 'users/show.phtml', $params);
+})->setName('user');
+
 // Обновление пользователя
 $app->get('/users/{id}/edit', function ($request, $response, array $args) {
     $id = $args['id'];
     $user = $this->get(UserDAO::class)->find($id);
+    dump($user);
     $params = [
         'userData' => [
             'id' => $user->getId(),
@@ -118,20 +160,5 @@ $app->get('/users/{id}/edit', function ($request, $response, array $args) {
     ];
     return $this->get('renderer')->render($response, 'users/edit.phtml', $params);
 })->setName('user.edit');
-
-// Конкретный пользователь
-$app->get('/users/{id}', function ($request, $response, array $args) {
-    $id = $args['id'];
-    $UserDAO = $this->get(UserDAO::class);
-    $user = $UserDAO->find($id);
-
-    if (!$user) {
-       return $response->write('Page not found')->withStatus(404);
-    }
-
-    $params = ['user' => $user];
-
-    return $this->get('renderer')->render($response, 'users/show.phtml', $params);
-})->setName('user');
 
 $app->run();

@@ -24,6 +24,17 @@ class UserDAO
         $user->setId($id);
     }
 
+    public function update(User $user): void
+    {
+        $sql = "UPDATE users SET name = :name, email = :email WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':name' => $user->getName(),
+            ':email' => $user->getEmail(),
+            ':id' => $user->getId()
+        ]);
+    }
+
     public function find(int $id): ?User
     {
         $sql = "SELECT * FROM users WHERE id = :id";

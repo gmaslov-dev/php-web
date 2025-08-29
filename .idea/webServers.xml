@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="2de099d5-d7ed-4db9-a06c-3a3ae8b248ff" name="sprinthost" url="http://141.8.192.217">
+        <fileTransfer rootFolder="/home/a1163807/domains/gmaslov-dev.ru/" accessType="SFTP" host="gmaslov-dev.ru" port="22" sshConfigId="146d2a1e-b160-4c32-9db4-06d6d002ea6a" sshConfig="a1163807@gmaslov-dev.ru:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

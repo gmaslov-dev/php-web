@@ -4,7 +4,7 @@ namespace PhpWeb;
 
 class UserValidator
 {
-    public function validate(array $user, UserDAO $dao): array
+    public function validateEmpty(array $user): array
     {
         // BEGIN (write your solution here)
         $errors = [];
@@ -19,10 +19,18 @@ class UserValidator
             $errors['email'] = "Must contains '@";
         }
 
-        if ($dao->findByEmail($user['email'])) {
-            $errors['email'] = 'Email is busy';
-        }
+
         return $errors;
         // END
+    }
+
+    public function validateUniqEmail($email, UserDAO $dao): array
+    {
+        $errors = [];
+        if ($dao->findByEmail($email)) {
+            $errors['email'] = 'Email is busy';
+        }
+
+        return $errors;
     }
 }
