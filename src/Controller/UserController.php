@@ -2,26 +2,24 @@
 
 namespace PhpWeb\Controller;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use PhpWeb\UserDAO;
-use Slim\Views\PhpRenderer;
-use Slim\Routing\RouteContext;
-use Slim\Flash\Messages;
+use PhpWeb\UserRepository;
+use Slim\Views\Twig;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 
-class UserController
+class UserController extends BaseController
 {
-    private $container;
-    private $renderer;
-    private $userDAO;
-    public function __construct(ContainerInterface $container, PhpRenderer $renderer, UserDAO $userDAO)
+    private UserRepository $repository;
+    public function __construct(Twig $renderer, UserRepository $repository)
     {
-        $this->container = $container;
-        $this->renderer = $renderer;
-        $this->userDAO = $userDAO;
+        parent::__construct($renderer);
+        $this->repository = $repository;
     }
+
 
     public function index(Request $request, Response $response): Response
     {
@@ -29,12 +27,11 @@ class UserController
         $page = (int) $request->getQueryParam('page', 1);
         $currentPage = max(1, $page);
 
-        $users = $this->userDAO->getAll();
+        $users = $this->repository->get($limit, (($currentPage - 1) * $limit));
         $totalPages = ceil(count($users) / $limit);
-        $currentUsers = array_slice($users, (($page - 1) * $limit), $limit);
-        dump($this);
-        return $this->renderer->render($response, 'index.phtml', [
-            'users' => $currentUsers,
+
+        return $this->view->render($response, 'users/index.twig', [
+            'users' => $users,
             'page' => $currentPage,
             'pages' => $totalPages
         ]);

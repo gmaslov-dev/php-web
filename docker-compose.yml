@@ -10,7 +10,6 @@ services:
       - ./:/var/www
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     depends_on:
-      - mysql
       - postgres
     networks:
       - app-network
@@ -32,30 +31,30 @@ services:
     networks:
       - app-network
 
-  mysql:
-    image: mysql:8.0
-    container_name: mysql_db
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USERNAME}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - app-network
+#  mysql:
+#    image: mysql:8.0
+#    container_name: mysql_db
+#    restart: unless-stopped
+#    environment:
+#      MYSQL_DATABASE: ${MYSQL_DATABASE}
+#      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#      MYSQL_USER: ${MYSQL_USERNAME}
+#      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - mysql_data:/var/lib/mysql
+#    networks:
+#      - app-network
 
   postgres:
     image: postgres:15
     container_name: postgres_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DATABASE}
-      POSTGRES_USER: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -63,21 +62,21 @@ services:
     networks:
       - app-network
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    restart: unless-stopped
-    environment:
-      PMA_HOST: mysql
-      PMA_USER: ${MYSQL_USERNAME}
-      PMA_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    ports:
-      - "8080:80"
-    depends_on:
-      - mysql
-    networks:
-      - app-network
+#  phpmyadmin:
+#    image: phpmyadmin/phpmyadmin
+#    container_name: phpmyadmin
+#    restart: unless-stopped
+#    environment:
+#      PMA_HOST: mysql
+#      PMA_USER: ${MYSQL_USERNAME}
+#      PMA_PASSWORD: ${MYSQL_PASSWORD}
+#      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#    ports:
+#      - "8080:80"
+#    depends_on:
+#      - mysql
+#    networks:
+#      - app-network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -98,7 +97,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
-    driver: local
   postgres_data:
     driver: local

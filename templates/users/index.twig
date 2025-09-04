@@ -1,0 +1,29 @@
+{% extends "layout.twig" %}
+
+{% block title %}Пользователи{% endblock %}
+
+{% block content %}
+
+<table>
+    {% for user in users %}
+        <tr>
+            <td>
+                <a href="{{ user.id }}">{{ user.name }}</a>
+            </td>
+            <td>
+                {{ user.email }}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+<nav>
+    {% if page > 1 %}
+        <a href="/users?page={{ page - 1 }}">назад</a>
+    {% endif %}
+
+    {% if page < pages %}
+        <a href="/users?page={{ page + 1 }}">вперед</a>
+    {% endif %}
+</nav>
+
+{% endblock %}

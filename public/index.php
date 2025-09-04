@@ -1,29 +1,53 @@
 <?php
 
 use PhpWeb\Controller\UserController;
-use PhpWeb\UserDAO;
+use PhpWeb\UserRepository;
 use Slim\Factory\AppFactory;
 use DI\Container;
 use Slim\Flash\Messages;
-use Slim\Views\PhpRenderer;
 use Slim\Middleware\MethodOverrideMiddleware;
+use Slim\Views\Twig;
+use Twig\Extension\DebugExtension;
+use Twig\Loader\FilesystemLoader;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 session_start();
 
-$conn = new PDO('sqlite:../php-web.sqlite');
-$conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
+$host     = $_ENV['DB_HOST'];
+$dbname   = $_ENV['DB_NAME'];
+$user     = $_ENV['DB_USER'];
+$password = $_ENV['DB_PASSWORD'];
+
+try {
+    $conn = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    error_log("Подключение к PostgreSQL установлено!");
+} catch (PDOException $e) {
+    die("Ошибка подключения: " . $e->getMessage());
+}
 
 $container = new Container();
-// Регистрируем DAO
-$container->set(UserDAO::class, function () use ($conn) {
-    return new UserDAO($conn);
+
+// Регистрируем Repository
+$container->set(UserRepository::class, function () use ($conn) {
+    return new UserRepository($conn);
 });
 
-// Регистрируем Renderer
-$container->set(PhpRenderer::class, function () {
-    return new PhpRenderer(__DIR__ . '/../templates');
+// Регистрируем Twig
+$container->set(Twig::class, function () {
+    $loader = new FilesystemLoader(__DIR__ . '/../templates');
+    $twig = new Twig($loader, [
+        'cache' => false,
+        'debug' => true,
+    ]);
+
+    $twig->addExtension(new DebugExtension());
+
+    return $twig;
 });
 
 // Регистрируем Flash
@@ -44,7 +68,7 @@ $app->get('/users', [UserController::class, 'index'])->setName('users');
 
 // Маршруты
 //$app->get('/', function ($request, $response) {
-//    return $this->get('renderer')->render($response, 'index.phtml');
+//    return $this->get('renderer')->render($response, 'index.twig');
 //})->setName('home');
 //
 //// Все пользователи
@@ -53,7 +77,7 @@ $app->get('/users', [UserController::class, 'index'])->setName('users');
 //    $page = (int) $request->getQueryParam('page', 1);
 //    $currentPage = max(1, $page);
 //
-//    $users = $this->get(UserDAO::class)->getAll();
+//    $users = $this->get(UserRepository::class)->getAll();
 //    $totalPages = ceil(count($users) / $limit);
 //    $currentUsers = array_slice($users, (($page - 1) * $limit), $limit);
 //
@@ -63,7 +87,7 @@ $app->get('/users', [UserController::class, 'index'])->setName('users');
 //        'pages' => $totalPages
 //    ];
 //
-//    return $this->get('renderer')->render($response, "users/index.phtml", $params);
+//    return $this->get('renderer')->render($response, "users/index.twig", $params);
 //})->setName('users');
 //
 //// Создание пользователя
@@ -84,7 +108,7 @@ $app->get('/users', [UserController::class, 'index'])->setName('users');
 //
 //// Сохранение пользователя
 //$app->post('/users', function ($request, $response) {
-//    $dao = $this->get(UserDAO::class);
+//    $dao = $this->get(UserRepository::class);
 //    $userData = $request->getParsedBodyParam('user');
 //    $validator = new UserValidator();
 //
@@ -106,18 +130,18 @@ $app->get('/users', [UserController::class, 'index'])->setName('users');
 //})->setName('users.post');
 //
 //$app->patch('/users/{id}', function ($request, $response, array $args) {
-//    $UserDAO = $this->get(UserDAO::class);
+//    $UserRepository = $this->get(UserRepository::class);
 //    $id = $args['id'];
-//    $user = $UserDAO->find($id);
+//    $user = $UserRepository->find($id);
 //    $data = $request->getParsedBodyParam('user');
 //
 //    $validator = new UserValidator();
-//    $errors = $validator->validateEmpty(['name' => $user->getName(), 'email' => $user->getEmail()], $UserDAO);
+//    $errors = $validator->validateEmpty(['name' => $user->getName(), 'email' => $user->getEmail()], $UserRepository);
 //    if (count($errors) === 0) {
 //        $user->setName($data['name']);
 //        $user->setEmail($data['email']);
 //        $this->get('flash')->addMessage('success', 'User was updated succesfully');
-//        $UserDAO->update($user);
+//        $UserRepository->update($user);
 //        $url = $this->get('router')->urlFor('user', ['id' => $id]);
 //        return $response->withRedirect($url);
 //    }
@@ -133,9 +157,9 @@ $app->get('/users', [UserController::class, 'index'])->setName('users');
 //// Конкретный пользователь
 //$app->get('/users/{id}', function ($request, $response, array $args) {
 //
-//    $UserDAO = $this->get(UserDAO::class);
+//    $UserRepository = $this->get(UserRepository::class);
 //    $id = $args['id'];
-//    $user = $UserDAO->find($id);
+//    $user = $UserRepository->find($id);
 //
 //    if (!$user) {
 //       return $response->write('Page not found')->withStatus(404);
@@ -149,7 +173,7 @@ $app->get('/users', [UserController::class, 'index'])->setName('users');
 //// Обновление пользователя
 //$app->get('/users/{id}/edit', function ($request, $response, array $args) {
 //    $id = $args['id'];
-//    $user = $this->get(UserDAO::class)->find($id);
+//    $user = $this->get(UserRepository::class)->find($id);
 //    dump($user);
 //    $params = [
 //        'userData' => [

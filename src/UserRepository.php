@@ -4,7 +4,7 @@ namespace PhpWeb;
 
 use PDO;
 
-class UserDAO
+class UserRepository
 {
     private PDO $pdo;
 
@@ -12,15 +12,16 @@ class UserDAO
     {
         $this->pdo = $pdo;
     }
+
     public function save(User $user): void
     {
-        $sql = "INSERT INTO users (name, email) VALUES (:name, :email)";
+        $sql = "INSERT INTO users (name, email) VALUES (:name, :email) RETURNING id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             ':name' => $user->getName(),
             ':email' => $user->getEmail()
         ]);
-        $id = $this->pdo->lastInsertId();
+        $id = $stmt->fetchColumn();
         $user->setId($id);
     }
 
@@ -40,12 +41,14 @@ class UserDAO
         $sql = "SELECT * FROM users WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
-        $result = $stmt->fetch();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
         if ($result) {
             $user = new User($result['name'], $result['email']);
             $user->setId($result['id']);
             return $user;
         }
+
         return null;
     }
 
@@ -54,24 +57,41 @@ class UserDAO
         $sql = "SELECT * FROM users WHERE email = :email";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':email' => $email]);
-        $result = $stmt->fetch();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
         if ($result) {
-            $user = new User($result['email'], $result['name']);
+            $user = new User($result['name'], $result['email']);
             $user->setId($result['id']);
             return $user;
         }
+
         return null;
+    }
+
+    private function createUser(array $row): User
+    {
+        $user = new User($row['name'], $row['email']);
+        $user->setId($row['id']);
+        return $user;
+    }
+
+    public function get($limit, $offset): array
+    {
+        $sql = "SELECT * FROM users LIMIT :limit OFFSET :offset";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':limit' => $limit, ':offset' => $offset]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_map(fn($row) => $this->createUser($row), $rows);
     }
 
     public function getAll(): array
     {
-        $rows = $this->pdo->query('SELECT * FROM users')->fetchAll();
+        $sql = "SELECT * FROM users";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map(function ($row) {
-            $user = new User($row['name'], $row['email']);
-            $user->setId($row['id']);
-
-            return $user;
-        }, $rows);
+        return array_map(fn($row) => $this->createUser($row), $rows);
     }
 }

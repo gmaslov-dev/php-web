@@ -24,7 +24,7 @@ class UserValidator
         // END
     }
 
-    public function validateUniqEmail($email, UserDAO $dao): array
+    public function validateUniqEmail($email, UserRepository $dao): array
     {
         $errors = [];
         if ($dao->findByEmail($email)) {
