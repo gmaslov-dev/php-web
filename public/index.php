@@ -7,6 +7,7 @@ use DI\Container;
 use Slim\Flash\Messages;
 use Slim\Middleware\MethodOverrideMiddleware;
 use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 
@@ -37,18 +38,10 @@ $container->set(UserRepository::class, function () use ($conn) {
     return new UserRepository($conn);
 });
 
-// Регистрируем Twig
-$container->set(Twig::class, function () {
-    $loader = new FilesystemLoader(__DIR__ . '/../templates');
-    $twig = new Twig($loader, [
-        'cache' => false,
-        'debug' => true,
-    ]);
-
-    $twig->addExtension(new DebugExtension());
-
-    return $twig;
+$container->set(Twig::class, function() {
+    return Twig::create(__DIR__ . '/../templates', ['cache' => false]);
 });
+
 
 // Регистрируем Flash
 $container->set('flash', function () {
@@ -59,6 +52,7 @@ $app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
 $app->add(MethodOverrideMiddleware::class);
 
+$app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
 // Регистрируем роутер
 $router = $app->getRouteCollector()->getRouteParser();
 $container->set('router', $router);

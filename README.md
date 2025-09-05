@@ -190,3 +190,15 @@ public/
 MIT
 
 ```
+
+```
+composer install
+php bin/db.php
+```
+
+
+# Установка зависимостей
+composer install
+
+# Создание БД и заполнение данными
+php bin/db.php
