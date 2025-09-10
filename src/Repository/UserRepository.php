@@ -1,8 +1,9 @@
 <?php
 
-namespace PhpWeb;
+namespace PhpWeb\Repository;
 
 use PDO;
+use PhpWeb\Entity\User;
 
 class UserRepository
 {

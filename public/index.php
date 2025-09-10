@@ -1,9 +1,10 @@
 <?php
 
-use PhpWeb\Controller\UserController;
-use PhpWeb\UserRepository;
-use Slim\Factory\AppFactory;
 use DI\Container;
+use PhpWeb\Controller\UserController;
+use PhpWeb\Database\Connection;
+use PhpWeb\Repository\UserRepository;
+use Slim\Factory\AppFactory;
 use Slim\Flash\Messages;
 use Slim\Middleware\MethodOverrideMiddleware;
 use Slim\Views\Twig;
@@ -18,24 +19,11 @@ session_start();
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
-$host     = $_ENV['DB_HOST'];
-$dbname   = $_ENV['DB_NAME'];
-$user     = $_ENV['DB_USER'];
-$password = $_ENV['DB_PASSWORD'];
-
-try {
-    $conn = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    error_log("Подключение к PostgreSQL установлено!");
-} catch (PDOException $e) {
-    die("Ошибка подключения: " . $e->getMessage());
-}
-
 $container = new Container();
 
 // Регистрируем Repository
-$container->set(UserRepository::class, function () use ($conn) {
-    return new UserRepository($conn);
+$container->set(UserRepository::class, function () {
+    return new UserRepository(Connection::getInstance());
 });
 
 $container->set(Twig::class, function() {

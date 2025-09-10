@@ -139,7 +139,7 @@ $pdo = new PDO('pgsql:host=postgres;dbname=postgres_app', 'postgres_user', 'post
 **SQLite (опционально):**
 
 ```php
-$pdo = new PDO('sqlite:/path/to/database.db');
+$pdo = new PDO('sqlite:/path/to/Database.db');
 ```
 
 ---

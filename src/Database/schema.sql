@@ -1,4 +1,4 @@
--- src/database/schema.sql
+-- src/Database/schema.sql
 
 DROP TABLE IF EXISTS users CASCADE;
 

@@ -1,6 +1,8 @@
 <?php
 
-namespace PhpWeb;
+namespace PhpWeb\Validator;
+
+use PhpWeb\Repository\UserRepository;
 
 class UserValidator
 {

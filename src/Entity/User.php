@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpWeb;
+namespace PhpWeb\Entity;
 
 class User
 {

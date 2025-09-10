@@ -2,9 +2,9 @@
 
 namespace PhpWeb\Controller;
 
+use PhpWeb\Repository\UserRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use PhpWeb\UserRepository;
 use Slim\Views\Twig;
 
 class UserController extends BaseController
