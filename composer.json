@@ -24,5 +24,8 @@
         "slim/twig-view": "^3.4",
         "twig/twig": "^3.21",
       "ext-pdo": "*"
+    },
+    "require-dev": {
+        "robmorgan/phinx": "^0.16.10"
     }
 }

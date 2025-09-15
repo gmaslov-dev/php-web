@@ -45,7 +45,11 @@ $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
 $router = $app->getRouteCollector()->getRouteParser();
 $container->set('router', $router);
 
-$app->get('/users', [UserController::class, 'index'])->setName('users');
+// $app->get('/users', [UserController::class, 'index'])->setName('users');
+
+$app->get('/', function ($request, $response) {
+    return $response->write('Hello, World');
+})->setName('home');
 
 
 // Маршруты

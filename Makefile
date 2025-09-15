@@ -5,4 +5,4 @@ driver-check:
 	docker exec -it php_app php /var/www/bin/check.php
 
 db-init:
-	docker exec -it php_app php /var/www/bin/db-init.php
+	docker exec -it php_app vendor/bin/phinx migrate
