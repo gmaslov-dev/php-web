@@ -1,5 +1,4 @@
-CREATE DATABASE postgres_app;
-
+-- CREATE DATABASE postgres_app;
 \c postgres_app;
 
 CREATE TABLE IF NOT EXISTS users (
