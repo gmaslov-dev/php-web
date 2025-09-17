@@ -2,7 +2,6 @@
 
 use DI\Container;
 use PhpWeb\Controller\UserController;
-use PhpWeb\Database\Connection;
 use PhpWeb\Repository\UserRepository;
 use Slim\Factory\AppFactory;
 use Slim\Flash\Messages;
@@ -21,11 +20,26 @@ $dotenv->load();
 
 $container = new Container();
 
-// Регистрируем Repository
-$container->set(UserRepository::class, function () {
-    return new UserRepository(Connection::getInstance());
+// Регистрация PDO
+$container->set(PDO::class, function () {
+    $host = $_ENV['DB_HOST'] ?? 'postgres';
+    $username = $_ENV['DB_USERNAME'] ?? 'postgres';
+    $password = $_ENV['DB_PASSWORD'] ?? 'postgres';
+    $dbname = $_ENV['DB_NAME'] ?? 'myapp';
+
+    $dsn = "pgsql:host=$host;port=5432;dbname=$dbname";
+    $pdo = new \PDO($dsn, $username, $password);
+    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+    return $pdo;
 });
 
+// Регистрируем Repository
+$container->set(UserRepository::class, function ($c) {
+    return new UserRepository($c->get(PDO::class));
+});
+
+// Регистрируем Twig
 $container->set(Twig::class, function() {
     return Twig::create(__DIR__ . '/../templates', ['cache' => false]);
 });
@@ -45,11 +59,8 @@ $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
 $router = $app->getRouteCollector()->getRouteParser();
 $container->set('router', $router);
 
-// $app->get('/users', [UserController::class, 'index'])->setName('users');
+$app->get('/users', [UserController::class, 'index'])->setName('users');
 
-$app->get('/', function ($request, $response) {
-    return $response->write('Hello, World');
-})->setName('home');
 
 
 // Маршруты
