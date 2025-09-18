@@ -10,11 +10,6 @@
     <option name="highlightLevel" value="WARNING" />
     <option name="transferred" value="true" />
   </component>
-  <component name="PhpCodeSniffer">
-    <phpcs_settings>
-      <phpcs_by_interpreter asDefaultInterpreter="true" interpreter_id="cff088e3-5605-4418-9c41-7d7bf4979ff7" timeout="30000" />
-    </phpcs_settings>
-  </component>
   <component name="PhpIncludePathManager">
     <include_path>
       <path value="$PROJECT_DIR$/vendor/nikic/fast-route" />
@@ -48,6 +43,15 @@
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php81" />
       <path value="$PROJECT_DIR$/vendor/twig/twig" />
       <path value="$PROJECT_DIR$/vendor/slim/twig-view" />
+      <path value="$PROJECT_DIR$/vendor/cakephp/datasource" />
+      <path value="$PROJECT_DIR$/vendor/cakephp/utility" />
+      <path value="$PROJECT_DIR$/vendor/cakephp/core" />
+      <path value="$PROJECT_DIR$/vendor/cakephp/chronos" />
+      <path value="$PROJECT_DIR$/vendor/cakephp/database" />
+      <path value="$PROJECT_DIR$/vendor/league/container" />
+      <path value="$PROJECT_DIR$/vendor/robmorgan/phinx" />
+      <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
+      <path value="$PROJECT_DIR$/vendor/psr/clock" />
       <path value="$PROJECT_DIR$/vendor/symfony/console" />
       <path value="$PROJECT_DIR$/vendor/symfony/string" />
       <path value="$PROJECT_DIR$/vendor/symfony/service-contracts" />
@@ -55,24 +59,10 @@
       <path value="$PROJECT_DIR$/vendor/symfony/filesystem" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-grapheme" />
       <path value="$PROJECT_DIR$/vendor/symfony/config" />
-      <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
-      <path value="$PROJECT_DIR$/vendor/psr/clock" />
-      <path value="$PROJECT_DIR$/vendor/robmorgan/phinx" />
-      <path value="$PROJECT_DIR$/vendor/league/container" />
-      <path value="$PROJECT_DIR$/vendor/cakephp/database" />
-      <path value="$PROJECT_DIR$/vendor/cakephp/datasource" />
-      <path value="$PROJECT_DIR$/vendor/cakephp/utility" />
-      <path value="$PROJECT_DIR$/vendor/cakephp/chronos" />
-      <path value="$PROJECT_DIR$/vendor/cakephp/core" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.4">
     <option name="suggestChangeDefaultLanguageLevel" value="false" />
-  </component>
-  <component name="PhpStan">
-    <PhpStan_settings>
-      <phpstan_by_interpreter asDefaultInterpreter="true" interpreter_id="cff088e3-5605-4418-9c41-7d7bf4979ff7" timeout="60000" />
-    </PhpStan_settings>
   </component>
   <component name="PhpStanOptionsConfiguration">
     <option name="transferred" value="true" />
@@ -81,11 +71,6 @@
     <phpunit_settings>
       <PhpUnitSettings custom_loader_path="$PROJECT_DIR$/vendor/autoload.php" />
     </phpunit_settings>
-  </component>
-  <component name="Psalm">
-    <Psalm_settings>
-      <psalm_fixer_by_interpreter asDefaultInterpreter="true" interpreter_id="cff088e3-5605-4418-9c41-7d7bf4979ff7" timeout="60000" />
-    </Psalm_settings>
   </component>
   <component name="PsalmOptionsConfiguration">
     <option name="transferred" value="true" />

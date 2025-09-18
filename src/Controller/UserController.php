@@ -6,26 +6,30 @@ use PhpWeb\Repository\UserRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
+use Slim\Flash\Messages;
 
 class UserController extends BaseController
 {
     private UserRepository $repository;
-    public function __construct(Twig $renderer, UserRepository $repository)
+    public function __construct(Twig $renderer, Messages $messages, UserRepository $repository)
     {
-        parent::__construct($renderer);
+        parent::__construct($renderer, $messages);
         $this->repository = $repository;
     }
 
 
     public function index(Request $request, Response $response): Response
     {
+        dump($this->view->getEnvironment()->getExtensions());
         $limit = 5;
         $page = (int) $request->getQueryParam('page', 1);
         $currentPage = max(1, $page);
 
         $users = $this->repository->get($limit, (($currentPage - 1) * $limit));
-        $totalPages = ceil(count($users) / $limit);
+        $totalUsers = $this->repository->getAll();
 
+        $totalPages = ceil(count($totalUsers) / $limit);
+        dump(count($totalUsers));
         return $this->view->render($response, 'users/index.twig', [
             'users' => $users,
             'page' => $currentPage,
@@ -33,18 +37,17 @@ class UserController extends BaseController
         ]);
     }
 
-//    public function new(Request $request, Response $response): Response
-//    {
+    public function new(Request $request, Response $response): Response
+    {
 //        $router = RouteContext::fromRequest($request)->getRouteParser();
-//        $success = $this->flash->getMessages()['success'] ?? [];
-//
-//        return $this->renderer->render($response, 'users/new.phtml', [
-//            'userData' => [],
-//            'errors' => [],
-//            'router' => $router,
-//            'success' => $success
-//        ]);
-//    }
+        $success = $this->flash->getMessages()['success'] ?? [];
+
+        return $this->view->render($response, 'users/new.twig', [
+            'userData' => [],
+            'errors' => [],
+            'success' => $success
+        ]);
+    }
 //
 //    public function create(Request $request, Response $response): Response
 //    {
@@ -62,7 +65,7 @@ class UserController extends BaseController
 //            return $response->withRedirect($this->getRouterUrl('users.new'));
 //        }
 //
-//        return $this->renderer->render($response, 'users/new.phtml', [
+//        return $this->renderer->render($response, 'users/new.twig', [
 //            'schoolData' => $userData,
 //            'errors' => $errors
 //        ])->withStatus(422);

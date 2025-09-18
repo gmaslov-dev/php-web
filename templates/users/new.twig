@@ -1,0 +1,26 @@
+{% extends "layout.twig" %}
+
+{% block title %}Пользователи{% endblock %}
+
+{% block content %}
+
+<form action="/users" name="users" method="post">
+    <label for="nickname">Имя</label>
+    <input type="text" name="user[name]" value="{{ userData.name|e }}">
+    {% if errors.name is defined %}
+    <span>{{ errors.name }}</span>
+    {% endif %}
+    <label for="email">Email</label>
+    <input type="email" name="user[email]" value="{{ userData.email|e }}">
+    {% if errors.email is defined %}
+    <span>{{ errors.email }}</span>
+    {% endif %}
+    <button type="submit">Сохранить</button>
+    {% if success is not empty %}
+    <div>
+        <p>{{ success[0] }}</p>
+    </div>
+    {% endif %}
+</form>
+
+{% endblock %}

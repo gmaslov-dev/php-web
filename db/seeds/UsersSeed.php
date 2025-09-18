@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Faker\Factory;
 use Phinx\Seed\AbstractSeed;
 
 class UsersSeed extends AbstractSeed
@@ -16,10 +17,15 @@ class UsersSeed extends AbstractSeed
      */
     public function run(): void
     {
-        $data = [
-            ['name' => 'John Doe', 'email' => 'john.doe@example.com'],
-            ['name' => 'Jane Smith', 'email' => 'jane.smith@example.com'],
-        ];
+        $faker = Factory::create();
+        $data = [];
+
+        for ($i = 0; $i < 100; $i++) {
+            $data[] = [
+                'name' => $faker->name,
+                'email' => $faker->unique()->safeEmail
+            ];
+        }
 
         $this->table('users')->insert($data)->saveData();
     }

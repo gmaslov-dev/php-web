@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="eng">
 <head>
     <title>{% block title %}Default Title{% endblock %}</title>
 </head>
@@ -9,5 +9,8 @@
         <h1>slim - app</h1>
     </header>
 {% block content %}{% endblock %}
+    <footer>
+        {% include 'partials/_footer.twig' %}
+    </footer>
 </body>
 </html>

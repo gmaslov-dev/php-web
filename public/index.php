@@ -3,11 +3,13 @@
 use DI\Container;
 use PhpWeb\Controller\UserController;
 use PhpWeb\Repository\UserRepository;
+use PhpWeb\Twig\AppExtension;
 use Slim\Factory\AppFactory;
 use Slim\Flash\Messages;
 use Slim\Middleware\MethodOverrideMiddleware;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 
@@ -41,9 +43,11 @@ $container->set(UserRepository::class, function ($c) {
 
 // Регистрируем Twig
 $container->set(Twig::class, function() {
-    return Twig::create(__DIR__ . '/../templates', ['cache' => false]);
-});
+    $twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
+    $twig->addExtension(new AppExtension());
 
+    return $twig;
+});
 
 // Регистрируем Flash
 $container->set('flash', function () {
@@ -59,8 +63,9 @@ $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
 $router = $app->getRouteCollector()->getRouteParser();
 $container->set('router', $router);
 
-$app->get('/users', [UserController::class, 'index'])->setName('users');
 
+$app->get('/users', [UserController::class, 'index'])->setName('users');
+$app->get('/users/new', [UserController::class, 'new'])->setName('users.new');
 
 
 // Маршруты
@@ -100,7 +105,7 @@ $app->get('/users', [UserController::class, 'index'])->setName('users');
 //        'success' => $success
 //    ];
 //
-//    return $this->get('renderer')->render($response, 'users/new.phtml', $params);
+//    return $this->get('renderer')->render($response, 'users/new.twig', $params);
 //})->setName('users.new');
 //
 //// Сохранение пользователя
@@ -123,7 +128,7 @@ $app->get('/users', [UserController::class, 'index'])->setName('users');
 //        'errors' => $errors
 //    ];
 //
-//    return $this->get('renderer')->render($response, 'users/new.phtml', $params)->withStatus(422);
+//    return $this->get('renderer')->render($response, 'users/new.twig', $params)->withStatus(422);
 //})->setName('users.post');
 //
 //$app->patch('/users/{id}', function ($request, $response, array $args) {
