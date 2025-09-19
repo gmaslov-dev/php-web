@@ -9,9 +9,6 @@ use Slim\Flash\Messages;
 use Slim\Middleware\MethodOverrideMiddleware;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
-use Twig\Environment;
-use Twig\Extension\DebugExtension;
-use Twig\Loader\FilesystemLoader;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -59,10 +56,6 @@ $app->addErrorMiddleware(true, true, true);
 $app->add(MethodOverrideMiddleware::class);
 
 $app->add(TwigMiddleware::create($app, $container->get(Twig::class)));
-// Регистрируем роутер
-$router = $app->getRouteCollector()->getRouteParser();
-$container->set('router', $router);
-
 
 $app->get('/users', [UserController::class, 'index'])->setName('users');
 $app->get('/users/new', [UserController::class, 'new'])->setName('users.new');

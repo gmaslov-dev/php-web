@@ -8,7 +8,7 @@
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/php-web.sqlite</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="postgres_app@localhost" uuid="c0f893f6-a8b8-463e-aabc-beadc98896a1">
+    <data-source source="LOCAL" name="postgres@localhost" uuid="c0f893f6-a8b8-463e-aabc-beadc98896a1">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
