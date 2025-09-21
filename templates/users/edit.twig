@@ -1,4 +1,4 @@
-<!--{% extends "layout.twig" %}-->
+{% extends "layout.twig" %}
 
 <form action="/users/<?= htmlspecialchars($userData['id']); ?>" name="users" method="post">
     <input type="hidden" name="_METHOD" value="PATCH">
@@ -7,7 +7,7 @@
     <?php if (isset($errors['name'])): ?>
         <span><?= $errors['name'] ?></span>
     <?php endif ?>
-    <label for="email">Email</label>
+    <label for="user[email]">Email</label>
     <input type="email" name="user[email]" value="<?= htmlspecialchars($userData['email'] ?? '');?>">
     <?php if (isset($errors['name'])): ?>
         <span><?= $errors['email'] ?></span>

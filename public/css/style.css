@@ -15,10 +15,13 @@ main {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-nav {
+ul {
     display: flex;
-    justify-content: space-around;
-    padding: 20px;
+    row-gap: 20px;
+}
+
+ul li {
+    list-style: none;
 }
 
 a{

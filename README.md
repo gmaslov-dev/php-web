@@ -21,18 +21,30 @@
 ```
 
 project/
+├── config/
+│   ├── container.php    # настройка DI-контейнера
+│   ├── middleware.php   # регистрация middleware
+│   └── routes.php       # маршруты
+├── public/
+│   └── index.php        # точка входа, здесь только bootstrap + run()
+├── src/
+│   ├── Controller/      # контроллеры
+│   ├── Repository/      # репозитории
+│   ├── Middleware/      # кастомные middleware
+│   └── Twig/            # расширения для Twig
+├── bootstrap/
+│   └── app.php          # сборка Slim-приложения
+├── templates/           # twig-шаблоны
 ├── docker/
 │   ├── php/
 │   │   └── local.ini
 │   └── nginx/
 │       └── default.conf
-├── public/
-│   └── index.php
-├── .env
 ├── Dockerfile
 ├── docker-compose.yml
-└── README.md
-
+├── README.md
+├── .env
+└── composer.json
 ````
 
 ---
