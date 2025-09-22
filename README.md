@@ -35,15 +35,15 @@ project/
 ├── bootstrap/
 │   └── app.php          # сборка Slim-приложения
 ├── templates/           # twig-шаблоны
-├── docker/
+├── docker/              # докер образы и конфиги
+│   ├── Dockerfile
 │   ├── php/
 │   │   └── local.ini
 │   └── nginx/
 │       └── default.conf
-├── Dockerfile
 ├── docker-compose.yml
 ├── README.md
-├── .env
+├── .env.example
 └── composer.json
 ````
 
